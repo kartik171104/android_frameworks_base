@@ -616,6 +616,7 @@ public class QSTileHost implements QSHost, Tunable, PluginListener<QSFactory>, P
                 }
             }
         }
+        tiles.remove("internet");
         return tiles;
     }
 

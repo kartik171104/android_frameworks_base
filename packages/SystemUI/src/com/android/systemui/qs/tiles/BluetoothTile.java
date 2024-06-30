@@ -72,9 +72,11 @@ public class BluetoothTile extends QSTileImpl<BooleanState> {
             StatusBarStateController statusBarStateController,
             ActivityStarter activityStarter,
             QSLogger qsLogger,
-            BluetoothController bluetoothController
+            BluetoothController bluetoothController,
+            KeyguardStateController keyguardStateController
     ) {
         super(host, backgroundLooper, mainHandler, falsingManager, metricsLogger,
+                statusBarStateController, activityStarter, qsLogger, keyguardStateController);
                 statusBarStateController, activityStarter, qsLogger);
         mController = bluetoothController;
         mController.observe(getLifecycle(), mCallback);
@@ -86,6 +88,15 @@ public class BluetoothTile extends QSTileImpl<BooleanState> {
     }
 
     @Override
+    protected void handleClick(@Nullable View view, boolean keyguardShowing) {
+        if (checkKeyguard(view, keyguardShowing)) {
+            return;
+        }
+        // Secondary clicks are header clicks, just toggle.
+        final boolean isEnabled = mState.value;
+        // Immediately enter transient enabling state when turning bluetooth on.
+        refreshState(isEnabled ? null : ARG_SHOW_TRANSIENT_ENABLING);
+        mController.setBluetoothEnabled(!isEnabled);
     protected void handleClick(@Nullable View view) {
         // Secondary clicks are header clicks, just toggle.
         final boolean isEnabled = mState.value;
